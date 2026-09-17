@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getDatabase } from "@/lib/db/database";
 import { COLLECTIONS } from "@/lib/db/collections";
+import { ensureDatabaseIndexes } from "@/lib/db/indexes";
 
 function generateSlug(name: string): string {
   return name
@@ -11,18 +12,62 @@ function generateSlug(name: string): string {
     .replace(/-+/g, "-");
 }
 
+async function generateUniqueSlug(
+  name: string,
+  excludeId?: ObjectId,
+): Promise<string> {
+  const db = await getDatabase();
+  const collection = db.collection(COLLECTIONS.REPOSITORIES);
+
+  const baseSlug = generateSlug(name);
+
+  let slug = baseSlug;
+  let counter = 2;
+
+  while (true) {
+    const query: {
+      slug: string;
+      _id?: { $ne: ObjectId };
+    } = { slug };
+
+    if (excludeId) {
+      query._id = { $ne: excludeId };
+    }
+
+    const existing = await collection.findOne(query);
+
+    if (!existing) {
+      return slug;
+    }
+
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+}
+
 export async function createRepository(
   userId: string,
   name: string,
   description?: string,
 ) {
-  const db = await getDatabase();
+  const trimmedName = name.trim();
 
-  const slug = generateSlug(name);
+  if (!trimmedName) {
+    throw new Error("Repository name cannot be empty");
+  }
+
+  if (!ObjectId.isValid(userId)) {
+    throw new Error("Invalid user ID");
+  }
+
+  const db = await getDatabase();
+  await ensureDatabaseIndexes();
+
+  const slug = await generateUniqueSlug(trimmedName);
 
   const repository = {
     userId: new ObjectId(userId),
-    name: name.trim(),
+    name: trimmedName,
     slug,
     description: description?.trim() || null,
     createdAt: new Date(),
@@ -40,6 +85,10 @@ export async function createRepository(
 }
 
 export async function getRepositories(userId: string) {
+  if (!ObjectId.isValid(userId)) {
+    throw new Error("Invalid user ID");
+  }
+
   const db = await getDatabase();
 
   return db
@@ -72,6 +121,14 @@ export async function updateRepository(
 ) {
   const db = await getDatabase();
 
+  const existing = await db
+    .collection(COLLECTIONS.REPOSITORIES)
+    .findOne({ slug });
+
+  if (!existing) {
+    return null;
+  }
+
   const updateData: {
     updatedAt: Date;
     name?: string;
@@ -89,7 +146,10 @@ export async function updateRepository(
     }
 
     updateData.name = name;
-    updateData.slug = generateSlug(name);
+    updateData.slug = await generateUniqueSlug(
+      name,
+      existing._id,
+    );
   }
 
   if (updates.description !== undefined) {
@@ -97,8 +157,18 @@ export async function updateRepository(
   }
 
   return db.collection(COLLECTIONS.REPOSITORIES).findOneAndUpdate(
-    { slug },
+    { _id: existing._id },
     { $set: updateData },
     { returnDocument: "after" },
   );
+}
+
+export async function deleteRepository(slug: string) {
+  const db = await getDatabase();
+
+  const result = await db
+    .collection(COLLECTIONS.REPOSITORIES)
+    .deleteOne({ slug });
+
+  return result.deletedCount > 0;
 }
