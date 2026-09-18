@@ -4,6 +4,7 @@ import { useState } from "react";
 import AppHeader from "@/components/layout/app-header";
 import AppSidebar from "@/components/layout/app-sidebar";
 import MobileNav from "@/components/layout/mobile-nav";
+import { LoginButton } from "@/components/auth/login-button";
 
 export default function Home() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -33,6 +34,7 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
                 Your Library
               </h1>
+		<LoginButton />
 
               <p className="mt-2 text-sm text-gray-500 md:text-base">
                 Organize your knowledge, notes and resources.
