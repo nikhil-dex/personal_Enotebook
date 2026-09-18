@@ -13,6 +13,8 @@
 #zip
 /project
 /.zip
+.zip*
+project.zip
 # testing
 /coverage
 
