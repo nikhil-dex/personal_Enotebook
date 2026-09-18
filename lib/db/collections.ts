@@ -1,7 +1,7 @@
 export const COLLECTIONS = {
   USERS: "users",
   REPOSITORIES: "repositories",
-  SECTIONS: "sections",
+  NOTEBOOKS: "notebooks",
   BLOCKS: "blocks",
   ASSETS: "assets",
 } as const;
