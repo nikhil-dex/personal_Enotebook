@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { BookOpen, Settings, Plus, X } from "lucide-react";
 
 interface AppSidebarProps {
@@ -7,11 +8,7 @@ interface AppSidebarProps {
   onClose?: () => void;
 }
 
-const repositories = [
-  "React",
-  "Machine Learning",
-  "DSA",
-];
+const repositories: string[] = [];
 
 export default function AppSidebar({
   mobile = false,
@@ -53,15 +50,16 @@ export default function AppSidebar({
         </p>
 
         <div className="space-y-1">
-          {repositories.map((repository) => (
-            <button
-              key={repository}
-              className="w-full rounded-lg px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-100"
-            >
-              {repository}
-            </button>
-          ))}
-        </div>
+  {repositories.map((repository) => (
+    <Link
+      key={repository}
+      href={`/repositories/${repository}`}
+      className="block w-full rounded-lg px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-100"
+    >
+      {repository}
+    </Link>
+  ))}
+</div>
       </nav>
 
       <div className="border-t p-3">

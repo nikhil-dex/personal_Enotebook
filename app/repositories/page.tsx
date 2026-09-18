@@ -27,9 +27,7 @@ const [loading, setLoading] = useState(true);
     }
 
     try {
-      const response = await fetch(
-        `/api/repositories?userId=${session.user.id}`,
-      );
+      const response = await fetch("/api/repositories");
 
       if (!response.ok) {
         throw new Error("Failed to fetch repositories");

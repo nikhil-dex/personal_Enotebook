@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import {
   createRepository,
   getRepositories,
@@ -34,19 +35,18 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
+    const session = await auth();
 
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "userId is required" },
-        { status: 400 },
+        { error: "Unauthorized" },
+        { status: 401 },
       );
     }
 
-    const repositories = await getRepositories(userId);
+    const repositories = await getRepositories(session.user.id);
 
     return NextResponse.json(repositories);
   } catch (error) {
