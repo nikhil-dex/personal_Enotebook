@@ -7,19 +7,27 @@ import {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const session = await auth();
 
-    const { userId, name, description } = body;
-
-    if (!userId || !name) {
+    if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "userId and name are required" },
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
+    const body = await request.json();
+    const { name, description } = body;
+
+    if (!name) {
+      return NextResponse.json(
+        { error: "name is required" },
         { status: 400 },
       );
     }
 
     const repository = await createRepository(
-      userId,
+      session.user.id,
       name,
       description,
     );

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import CreateRepositoryForm from "@/components/repository/create-repository-form";
 
 type Repository = {
   _id: string;
@@ -15,7 +16,7 @@ type Repository = {
 
 export default function RepositoriesPage() {
   const { data: session, status } = useSession();
-
+const [createOpen, setCreateOpen] = useState(false);
 const [repositories, setRepositories] = useState<Repository[]>([]);
 const [loading, setLoading] = useState(true);
 
@@ -48,15 +49,25 @@ const [loading, setLoading] = useState(true);
   return (
     <main className="min-h-screen bg-gray-50 p-5 md:p-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
-            Your Library
-          </h1>
+        <div className="mb-8 flex items-start justify-between gap-4">
+  <div>
+    <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
+      Your Library
+    </h1>
 
-          <p className="mt-2 text-sm text-gray-500 md:text-base">
-            Organize your knowledge into repositories.
-          </p>
-        </div>
+    <p className="mt-2 text-sm text-gray-500 md:text-base">
+      Organize your knowledge into repositories.
+    </p>
+  </div>
+
+  <button
+    type="button"
+    onClick={() => setCreateOpen(true)}
+    className="shrink-0 rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+  >
+    + Create Repository
+  </button>
+</div>
 
         {loading ? (
           <div className="text-sm text-gray-500">
@@ -104,6 +115,29 @@ const [loading, setLoading] = useState(true);
           </div>
         )}
       </div>
+      {createOpen && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">
+          Create Repository
+        </h2>
+
+        <p className="mt-1 text-sm text-gray-500">
+          Create a space for your notebooks and resources.
+        </p>
+      </div>
+
+      <CreateRepositoryForm
+        onCreated={() => {
+          setCreateOpen(false);
+          window.location.reload();
+        }}
+        onCancel={() => setCreateOpen(false)}
+      />
+    </div>
+  </div>
+)}
     </main>
   );
 }

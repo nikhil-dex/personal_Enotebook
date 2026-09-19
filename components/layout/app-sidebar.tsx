@@ -38,10 +38,13 @@ export default function AppSidebar({
       </div>
 
       <div className="p-4">
-        <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800">
-          <Plus size={17} />
-          Create Repository
-        </button>
+        <Link
+  href="/repositories"
+  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+>
+  <Plus size={16} />
+  Create Repository
+</Link>
       </div>
 
       <nav className="flex-1 px-3">
