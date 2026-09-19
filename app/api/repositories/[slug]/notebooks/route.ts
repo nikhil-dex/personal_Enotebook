@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import {
   getRepository,
 } from "@/services/repositories/repository.service";
@@ -60,14 +61,23 @@ export async function POST(
   context: RouteContext,
 ) {
   try {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
     const { slug } = await context.params;
 
     const body = await request.json();
-    const { userId, name } = body;
+    const { name } = body;
 
-    if (!userId || !name) {
+    if (!name) {
       return NextResponse.json(
-        { error: "userId and name are required" },
+        { error: "name is required" },
         { status: 400 },
       );
     }
@@ -81,8 +91,15 @@ export async function POST(
       );
     }
 
+    if (repository.userId.toString() !== session.user.id) {
+      return NextResponse.json(
+        { error: "Forbidden" },
+        { status: 403 },
+      );
+    }
+
     const notebook = await createNotebook(
-      userId,
+      session.user.id,
       repository._id.toString(),
       name,
     );
