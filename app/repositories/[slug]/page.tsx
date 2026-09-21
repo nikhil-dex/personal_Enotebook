@@ -91,21 +91,22 @@ const notebooks = await getNotebooks(
   ) : (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {notebooks.map((notebook) => (
-        <div
-          key={notebook._id.toString()}
-          className="rounded-xl border bg-white p-5 transition hover:-translate-y-0.5 hover:shadow-md"
-        >
-          <div className="mb-3 text-3xl">📓</div>
+        <Link
+  key={notebook._id.toString()}
+  href={`/repositories/${slug}/notebooks/${notebook._id.toString()}`}
+  className="block rounded-xl border bg-white p-5 transition hover:-translate-y-0.5 hover:shadow-md"
+>
+  <div className="mb-3 text-3xl">📓</div>
 
-          <h3 className="font-semibold text-gray-900">
-            {notebook.name}
-          </h3>
+  <h3 className="font-semibold text-gray-900">
+    {notebook.name}
+  </h3>
 
-          <p className="mt-3 text-xs text-gray-400">
-            Updated{" "}
-            {new Date(notebook.updatedAt).toLocaleDateString()}
-          </p>
-        </div>
+  <p className="mt-3 text-xs text-gray-400">
+    Updated{" "}
+    {new Date(notebook.updatedAt).toLocaleDateString()}
+  </p>
+</Link>
       ))}
     </div>
   )}

@@ -15,3 +15,17 @@ export async function ensureDatabaseIndexes() {
     { userId: 1, updatedAt: -1 },
   );
 }
+export async function ensureBlockIndexes() {
+  const db = await getDatabase();
+  const blocks = db.collection(COLLECTIONS.BLOCKS);
+
+  await blocks.createIndex({
+    notebookId: 1,
+    position: 1,
+  });
+
+  await blocks.createIndex({
+    userId: 1,
+    notebookId: 1,
+  });
+}
