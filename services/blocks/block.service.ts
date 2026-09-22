@@ -87,11 +87,15 @@ export async function getBlocks(
   const db = await getDatabase();
 
   return db
-    .collection(COLLECTIONS.BLOCKS)
-    .find({
-      userId: new ObjectId(userId),
-      notebookId: new ObjectId(notebookId),
-    })
-    .sort({ position: 1 })
-    .toArray();
+  .collection(COLLECTIONS.BLOCKS)
+  .find({
+    userId: new ObjectId(userId),
+    notebookId: new ObjectId(notebookId),
+  })
+  .sort({
+    position: 1,
+    createdAt: 1,
+    _id: 1,
+  })
+  .toArray();
 }
