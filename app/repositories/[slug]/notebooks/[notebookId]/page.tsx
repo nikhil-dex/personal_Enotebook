@@ -60,7 +60,15 @@ export default async function NotebookPage({
             </p>
           </div>
 
-          <NotebookEditor notebookId={notebookId} />
+          <NotebookEditor
+  notebookId={notebookId}
+  initialBlocks={blocks.map((block) => ({
+    _id: block._id.toString(),
+    type: block.type,
+    content: block.content,
+    position: block.position,
+  }))}
+/>
         </div>
       </div>
     </main>
