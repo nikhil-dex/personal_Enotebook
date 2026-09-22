@@ -37,15 +37,30 @@ export async function createBlock({
 
   const now = new Date();
 
-  const block = {
+const blocks = db.collection(COLLECTIONS.BLOCKS);
+
+const lastBlock = await blocks
+  .find({
     userId: new ObjectId(userId),
     notebookId: new ObjectId(notebookId),
-    type,
-    content,
-    position,
-    createdAt: now,
-    updatedAt: now,
-  };
+  })
+  .sort({ position: -1 })
+  .limit(1)
+  .next();
+
+const nextPosition = lastBlock
+  ? lastBlock.position + 1
+  : 0;
+
+const block = {
+  userId: new ObjectId(userId),
+  notebookId: new ObjectId(notebookId),
+  type,
+  content,
+  position: nextPosition,
+  createdAt: now,
+  updatedAt: now,
+};
 
   const result = await db
     .collection(COLLECTIONS.BLOCKS)
